@@ -1,0 +1,6 @@
+use_frameworks!
+target 'NasAPI_Tests' do
+  pod 'NasAPI', :path => '../'
+  
+  
+end
