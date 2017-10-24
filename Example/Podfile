@@ -1,6 +1,8 @@
 use_frameworks!
 target 'NasAPI_Tests' do
   pod 'NasAPI', :path => '../'
-  
+  pod 'AlamofireImage', '~> 3.3'
+  pod 'Alamofire', '~> 4.5'
+  pod 'SwiftyJSON'
   
 end
