@@ -7,7 +7,7 @@
 import UIKit
 
 public class NasAPI {
-    static var APIKey = "kGAYGkWiaqhzx1QY5Q1iuQWtQN17hVrCOjPJxN8W"
+    static var APIKey = ""
     
     public class func setApiKey(_ key: String) {
         NasAPI.APIKey = key
