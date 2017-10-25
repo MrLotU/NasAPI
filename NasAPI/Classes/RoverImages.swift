@@ -10,6 +10,7 @@ import SwiftyJSON
 
 public typealias RoverImageCompletion = ([RoverImage]?, Error?) -> Void
 public typealias RoverImageReturnValue = (images: [RoverImage], continue: Bool)
+public typealias RoverImageDownloadCompletion = (Image?, Error?) -> Void
 
 public enum RoverError: String, Error {
     case InvalidRover = "Invalid Rover Name"
@@ -22,9 +23,20 @@ public class RoverImage {
     public let id: Int
     public let sol: Int
     public let camera: RoverCamera
-    public let imgSrc: URLConvertible
+    public let imgSrc: String
     public let earthDate: Date
     public let roverName: String
+    
+    public func getImage(completion: @escaping RoverImageDownloadCompletion) {
+        Alamofire.request(imgSrc).responseImage { (response) in
+            if let error = response.error {
+                completion(nil, error)
+            }
+            if let image = response.result.value {
+                completion(image, nil)
+            }
+        }
+    }
     
     init?(withJSON json: JSON) {
         guard let id = json["id"].int else {return nil}
@@ -59,7 +71,7 @@ public enum RoverCamera: String {
 
 
 extension NasAPI {
-    public class func getImages(forRoverWithName roverName: String, andSol sol: Int, page: Int=0, completion: @escaping RoverImageCompletion, images: [RoverImage]=[]) {
+    public class func getImages(forRoverWithName roverName: String, andSol sol: Int, page: Int=0, completion: @escaping RoverImageCompletion) {
         var url = "https://api.nasa.gov/mars-photos/api/v1/rovers/\(roverName)/photos?sol=\(sol)"
         url += "&page=\(page)"
         if NasAPI.APIKey != "" {
@@ -74,11 +86,9 @@ extension NasAPI {
                 if let error = json["errors"].string {
                     completion(nil, RoverError(rawValue: error) ?? RoverError.Unknown)
                 }
-                let images = NasAPI.getImages(fromJSON: json, atPage: page, withSol: sol, forRover: roverName, andWithImages: images, completion: completion)
-                if !images.continue {
-                    completion(images.images, nil)
-                    return
-                }
+                let images = NasAPI.getImages(fromJSON: json, atPage: page, withSol: sol, forRover: roverName, completion: completion)
+                completion(images.images, nil)
+                return
             case .failure(let error):
                 completion(nil, error)
                 return
@@ -86,9 +96,9 @@ extension NasAPI {
         }
     }
     
-    fileprivate class func getImages(fromJSON json: JSON, atPage page: Int, withSol sol: Int, forRover rover: String, andWithImages images: [RoverImage], completion: @ escaping RoverImageCompletion) -> RoverImageReturnValue {
+    fileprivate class func getImages(fromJSON json: JSON, atPage page: Int, withSol sol: Int, forRover rover: String, completion: @escaping RoverImageCompletion) -> RoverImageReturnValue {
+        var images: [RoverImage] = []
         guard let photosArray = json["photos"].array else {return (images, false)}
-        var images = images
         guard photosArray != [] else {return (images, false)}
         for imageJSON in photosArray {
             if let image = RoverImage(withJSON: imageJSON) {
@@ -98,7 +108,7 @@ extension NasAPI {
             }
         }
         let page = page + 1
-        NasAPI.getImages(forRoverWithName: rover, andSol: sol, page: page, completion: completion, images: images)
+        NasAPI.getImages(forRoverWithName: rover, andSol: sol, page: page, completion: completion)
         return (images, true)
     }
 }
