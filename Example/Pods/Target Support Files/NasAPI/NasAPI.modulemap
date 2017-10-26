@@ -1,0 +1,6 @@
+framework module NasAPI {
+  umbrella header "NasAPI-umbrella.h"
+
+  export *
+  module * { export * }
+}
