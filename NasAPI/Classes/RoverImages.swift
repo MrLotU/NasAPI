@@ -12,6 +12,8 @@ public typealias RoverImageCompletion = ([RoverImage]?, Error?) -> Void
 public typealias RoverImageReturnValue = (images: [RoverImage], continue: Bool)
 public typealias RoverImageDownloadCompletion = (Image?, Error?) -> Void
 
+//MARK: Enums
+
 public enum RoverError: String, Error {
     case InvalidRover = "Invalid Rover Name"
     case InvalidAPIKey
@@ -19,14 +21,35 @@ public enum RoverError: String, Error {
     case Unknown
 }
 
+/// All available rover cameras
+public enum RoverCamera: String {
+    case fhaz = "FHAZ"
+    case rhaz = "RHAZ"
+    case mast = "MAST"
+    case chemcam = "CHEMCAM"
+    case mahli = "MAHLI"
+    case mardi = "MARDI"
+    case navcam = "NAVCAM"
+}
+
+//MARK: Classes
+
+/// Holds a RoverImage object
 public class RoverImage {
+    /// Image ID
     public let id: Int
+    /// Image SOL (martian date)
     public let sol: Int
+    /// Camera that took the image
     public let camera: RoverCamera
+    /// Imagae source URL
     public let imgSrc: String
+    /// Earth date the image was taken
     public let earthDate: Date
+    /// Rover that took the image
     public let roverName: String
     
+    /// Gets the Image object for the RoverImage object
     public func getImage(completion: @escaping RoverImageDownloadCompletion) {
         Alamofire.request(imgSrc).responseImage { (response) in
             if let error = response.error {
@@ -38,6 +61,8 @@ public class RoverImage {
         }
     }
     
+    //MARK: Initalizers
+    /// Initializes RoverImage object from a JSON
     init?(withJSON json: JSON) {
         guard let id = json["id"].int else {return nil}
         guard let sol = json["sol"].int else {return nil}
@@ -46,7 +71,7 @@ public class RoverImage {
         guard let imgSrc = json["img_src"].string else {return nil}
         guard let earthDateString = json["earth_date"].string else {return nil}
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "YYYY-MM-DD"
+        dateFormatter.dateFormat = "YYYY-MM-dd"
         guard let date = dateFormatter.date(from: earthDateString) else {return nil}
         guard let roverName = json["rover"]["name"].string else {return nil}
         
@@ -59,18 +84,8 @@ public class RoverImage {
     }
 }
 
-public enum RoverCamera: String {
-    case fhaz = "FHAZ"
-    case rhaz = "RHAZ"
-    case mast = "MAST"
-    case chemcam = "CHEMCAM"
-    case mahli = "MAHLI"
-    case mardi = "MARDI"
-    case navcam = "NAVCAM"
-}
-
-
 extension NasAPI {
+    /// Gets all images by a specific rover for a specific sol (martian date)
     public class func getImages(forRoverWithName roverName: String, andSol sol: Int, page: Int=0, completion: @escaping RoverImageCompletion) {
         var url = "https://api.nasa.gov/mars-photos/api/v1/rovers/\(roverName)/photos?sol=\(sol)"
         url += "&page=\(page)"

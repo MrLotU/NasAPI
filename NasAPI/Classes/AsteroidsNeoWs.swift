@@ -30,6 +30,8 @@ public class Asteroid {
     /// Approach Data
     public let approachData: CloseApproachData
     
+    //MARK: Initializers
+    /// Initializes Asteroid object fom a JSON
     init?(fromJSON json: JSON) {
         guard let id = json["neo_reference_id"].string else {return nil}
         guard let name = json["name"].string else {return nil}
@@ -61,6 +63,8 @@ public struct CloseApproachData {
     /// Body the asteroid is orbiting
     public let orbitingBody: String
     
+    //MARK: Initializers
+    /// Initializes CloseApproachData object from a JSON
     init?(fromJSON json: JSON) {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "YYYY-MM-dd"
@@ -78,6 +82,7 @@ public struct CloseApproachData {
 }
 
 extension NasAPI {
+    /// Gets all asteroids for the date of today
     public class func getAsteroidDataForToday(detailed: Bool = false, completion: @escaping AsteroidCopmletion) {
         var url = "https://api.nasa.gov/neo/rest/v1/feed/today"
         if detailed {
@@ -105,7 +110,8 @@ extension NasAPI {
             }
         }
     }
-    
+
+    /// Creates Asteroids from JSON objects
     fileprivate class func getAsteroids(fromJSON jsonArray: [JSON], completion: @escaping AsteroidCopmletion) {
         var asteroids: [Asteroid] = []
         for json in jsonArray {
