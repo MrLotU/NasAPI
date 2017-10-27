@@ -15,12 +15,19 @@ public enum NeoWsError: Error {
     case Unknown
 }
 
+/// Holds an asteroid object
 public class Asteroid {
+    /// Asteroid ID
     public let id: String
+    /// Asteroid Name
     public let name: String
+    /// JPL URL, holds more info
     public let jplUrl: String
+    /// Asteroid diameter in meters
     public let diameter: Double
+    /// Bool indicating if asteroid is potentially hazardous to earth
     public let hazardous: Bool
+    /// Approach Data
     public let approachData: CloseApproachData
     
     init?(fromJSON json: JSON) {
@@ -43,10 +50,15 @@ public class Asteroid {
     }
 }
 
+/// Holding all close approach data for an asteroid
 public struct CloseApproachData {
+    /// Date the data was measured
     public let date: Date
+    /// Relative speed of the asteroid (relative to orbiting body) in kilometers per hour
     public let relativeSpeed: String
+    /// Distance to orbiting body in kilometers
     public let distance: String
+    /// Body the asteroid is orbiting
     public let orbitingBody: String
     
     init?(fromJSON json: JSON) {
