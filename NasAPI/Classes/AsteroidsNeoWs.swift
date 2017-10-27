@@ -16,24 +16,53 @@ public enum NeoWsError: Error {
 }
 
 public class Asteroid {
-    public let id: Int
+    public let id: String
     public let name: String
     public let jplUrl: String
     public let diameter: Double
     public let hazardous: Bool
-    public let closeApproach: [CloseApproachData]
+    public let approachData: CloseApproachData
     
-    init?(fromJSON: JSON) {
-        //TODO: Implement
-        return nil
+    init?(fromJSON json: JSON) {
+        guard let id = json["neo_reference_id"].string else {return nil}
+        guard let name = json["name"].string else {return nil}
+        guard let jplUrl = json["nasa_jpl_url"].string else {return nil}
+        guard let diameterMin = json["estimated_diameter"]["meters"]["estimated_diameter_min"].double else {return nil}
+        guard let diameterMax = json["estimated_diameter"]["meters"]["estimated_diameter_max"].double else {return nil}
+        let diameter = (diameterMax/diameterMin) * 2.0
+        guard let hazardous = json["is_potentially_hazardous_asteroid"].bool else {return nil}
+        guard let approachJSON = json["close_approach_data"].array else {return nil}
+        guard let approachData = CloseApproachData(fromJSON: approachJSON[0]) else {return nil}
+        
+        self.id = id
+        self.name = name
+        self.jplUrl = jplUrl
+        self.diameter = diameter
+        self.hazardous = hazardous
+        self.approachData = approachData
     }
 }
 
 public struct CloseApproachData {
     public let date: Date
-    public let relativeSpeed: Double
-    public let distance: Double
+    public let relativeSpeed: String
+    public let distance: String
     public let orbitingBody: String
+    
+    init?(fromJSON json: JSON) {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "YYYY-MM-dd"
+        guard let dateStr = json["close_approach_date"].string else {return nil}
+        guard let date = dateFormatter.date(from: dateStr) else {return nil}
+        guard let speed = json["relative_velocity"]["kilometers_per_hour"].string else {return nil}
+        guard let distance = json["miss_distance"]["kilometers"].string else {return nil}
+        guard let orbitingBody = json["orbiting_body"].string else {return nil}
+        
+        self.date = date
+        self.relativeSpeed = speed
+        self.distance = distance
+        self.orbitingBody = orbitingBody
+    }
 }
 
 extension NasAPI {
@@ -51,10 +80,13 @@ extension NasAPI {
                 let json = JSON(value)
                 let date = Date()
                 let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "YYYY-MM-DD"
+                dateFormatter.dateFormat = "YYYY-MM-dd"
                 let dateString = dateFormatter.string(from: date)
                 if let objects = json["near_earth_objects"][dateString].array {
                     getAsteroids(fromJSON: objects, completion: completion)
+                } else {
+                    print(dateString)
+                    completion(nil, NeoWsError.Unknown)
                 }
             case .failure(let error):
                 completion(nil, error)
