@@ -63,6 +63,13 @@ public struct CloseApproachData {
     /// Body the asteroid is orbiting
     public let orbitingBody: String
     
+    /// Date the data was measured
+    public var dateStr: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "YYYY-MM-dd"
+        return dateFormatter.string(from: self.date)
+    }
+    
     //MARK: Initializers
     /// Initializes CloseApproachData object from a JSON
     init?(fromJSON json: JSON) {
