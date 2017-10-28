@@ -109,7 +109,6 @@ extension NasAPI {
                 if let objects = json["near_earth_objects"][dateString].array {
                     getAsteroids(fromJSON: objects, completion: completion)
                 } else {
-                    print(dateString)
                     completion(nil, NeoWsError.Unknown)
                 }
             case .failure(let error):

@@ -133,7 +133,7 @@ extension NasAPI {
                     completion(nil, EarthImageError(rawValue: error) ?? EarthImageError.Unknown)
                     return
                 }
-                guard let results = json["results"].array else {completion(nil, EarthImageError.NoResultsReturned); return}
+                guard let results = json["results"].array, results.count > 0 else {completion(nil, EarthImageError.NoResultsReturned); return}
                 var assets: [EarthAsset] = []
                 for result in results {
                     if let asset = EarthAsset(fromJSON: result) {
