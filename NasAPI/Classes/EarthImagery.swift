@@ -14,7 +14,7 @@ public typealias DownloadEarthImageCompletion = (Image?, Error?) -> Void
 public typealias EarthImageCompletion = (EarthImage?, Error?) -> Void
 public typealias EarthAssetCompletion = ([EarthAsset]?, Error?) -> Void
 
-enum EarthImageError: String, Error {
+public enum EarthImageError: String, Error {
     case IndexOutOfRange = "list index out of range"
     case NoResultsReturned
     case FailedToInitializeImage
