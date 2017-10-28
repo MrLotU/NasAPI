@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		05006BDD7301FCF2678618DEDCC69B94 /* UIImage+AlamofireImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B48DF9AC56B75ECE9AC6E79A8592C6 /* UIImage+AlamofireImage.swift */; };
 		086A71961FA0C51A00ACDFBC /* AsteroidsNeoWs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 086A71951FA0C51A00ACDFBC /* AsteroidsNeoWs.swift */; };
+		08A4B0E91FA37A4300F92E2A /* EarthImagery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08A4B0E81FA37A4300F92E2A /* EarthImagery.swift */; };
 		0AA9DFC4D6C39F86DC9B12EA65ADDA9A /* SwiftyJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 470777C78F3A3E9D318096B251755BC6 /* SwiftyJSON.framework */; };
 		10EB23E9ECC4B33E16933BB1EA560B6A /* Timeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B4F41BCC17E181DBC5B569FEA94F587 /* Timeline.swift */; };
 		1B9EDEDC964E6B08F78920B4F4B9DB84 /* Alamofire-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 00F4FFA77F8BA69001838AA9389BE87B /* Alamofire-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -121,6 +122,7 @@
 		00F4FFA77F8BA69001838AA9389BE87B /* Alamofire-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Alamofire-umbrella.h"; sourceTree = "<group>"; };
 		05ADAD259D628508E4CAE48D16C182BD /* Alamofire-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Alamofire-dummy.m"; sourceTree = "<group>"; };
 		086A71951FA0C51A00ACDFBC /* AsteroidsNeoWs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AsteroidsNeoWs.swift; path = NasAPI/Classes/AsteroidsNeoWs.swift; sourceTree = "<group>"; };
+		08A4B0E81FA37A4300F92E2A /* EarthImagery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EarthImagery.swift; path = NasAPI/Classes/EarthImagery.swift; sourceTree = "<group>"; };
 		0AA6CE471F2C951AA4A9456BB3B6CB21 /* Pods-NasAPI_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-NasAPI_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		0BE3368A311B297755457AB1623E4DEF /* AlamofireImage-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "AlamofireImage-prefix.pch"; sourceTree = "<group>"; };
 		0F13E4352CB1FA6950F9F6CB0526F411 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -405,6 +407,7 @@
 				7C2E6A340B2C8E48902775EB21B29064 /* NasAPI.swift */,
 				E3E0A343D96B38562EB53AB8EB6ACABA /* RoverImages.swift */,
 				086A71951FA0C51A00ACDFBC /* AsteroidsNeoWs.swift */,
+				08A4B0E81FA37A4300F92E2A /* EarthImagery.swift */,
 				1F58745227D2256A2B45B369AA9E57A1 /* Support Files */,
 			);
 			name = NasAPI;
@@ -684,6 +687,7 @@
 				E952E9FE241180302788BE3CC024DEAB /* NasAPI-dummy.m in Sources */,
 				086A71961FA0C51A00ACDFBC /* AsteroidsNeoWs.swift in Sources */,
 				F24C161BDF12A8730431050EAFD14437 /* NasAPI.swift in Sources */,
+				08A4B0E91FA37A4300F92E2A /* EarthImagery.swift in Sources */,
 				57D7558C277D38719B27D998D7F8D24C /* RoverImages.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
