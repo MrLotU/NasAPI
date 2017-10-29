@@ -14,6 +14,7 @@ public enum NeoWsError: Error {
     case FailedToInitializeObject
     case NoResultsReturned
     case FailedToGetAsteroidsJSON
+    case InvalidAPIKey
     case Unknown
 }
 
@@ -99,7 +100,11 @@ extension NasAPI {
         } else {
             url += "?detailed=false"
         }
-        url += "&api_key=\(NasAPI.APIKey)"
+        if NasAPI.APIKey != "" {
+            url += "&api_key=\(NasAPI.APIKey)"
+        } else {
+            completion(nil, .InvalidAPIKey)
+        }
         Alamofire.request(url).responseJSON { (response) in
             switch response.result {
             case .success(let value):

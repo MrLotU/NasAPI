@@ -20,6 +20,7 @@ public enum EarthImageError: String, Error {
     case FailedToInitializeImage
     case FailedToInitalizeAsset
     case FailedToGetImage
+    case InvalidAPIKey
     case Unknown
 }
 
@@ -118,7 +119,11 @@ extension NasAPI {
         url += "&lat=\(location.coordinate.latitude)"
         url += "&date=\(asset.dateStr)"
         if cloudScore { url += "&cloud_score=true" }
-        url += "&api_key=\(NasAPI.APIKey)"
+        if NasAPI.APIKey != "" {
+            url += "&api_key=\(NasAPI.APIKey)"
+        } else {
+            completion(nil, .InvalidAPIKey)
+        }
         
         Alamofire.request(url).responseJSON { (response) in
             switch response.result {
@@ -139,7 +144,11 @@ extension NasAPI {
         var url = "https://api.nasa.gov/planetary/earth/assets"
         url += "?lon=\(location.coordinate.longitude)"
         url += "&lat=\(location.coordinate.latitude)"
-        url += "&api_key=\(NasAPI.APIKey)"
+        if NasAPI.APIKey != "" {
+            url += "&api_key=\(NasAPI.APIKey)"
+        } else {
+            completion(nil, .InvalidAPIKey)
+        }
         Alamofire.request(url).responseJSON { (response) in
             switch response.result {
             case .success(let value):
