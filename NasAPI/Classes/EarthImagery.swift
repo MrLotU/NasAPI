@@ -106,9 +106,9 @@ extension NasAPI {
             if let error = error {
                 completion(nil, error); return
             }
-            guard var assets = assets else {completion(nil, EarthImageError.NoResultsReturned); return}
+            guard var assets = assets else {completion(nil, .NoResultsReturned); return}
             assets = assets.sorted { $0.date > $1.date }
-            guard let closestAsset = assets.first else {completion(nil, EarthImageError.NoResultsReturned); return}
+            guard let closestAsset = assets.first else {completion(nil, .NoResultsReturned); return}
             NasAPI.getImage(forAsset: closestAsset, andLocation: location, withCloudScore: cloudScore, completion: completion)
         }
     }
@@ -163,7 +163,7 @@ extension NasAPI {
                     if let asset = EarthAsset(fromJSON: result) {
                         assets.append(asset)
                     } else {
-                        completion(nil, EarthImageError.FailedToInitalizeAsset)
+                        completion(nil, .FailedToInitalizeAsset)
                         return
                     }
                 }
