@@ -40,7 +40,7 @@ public struct EarthAsset {
     init?(fromJSON json: JSON) {
         guard let dateStr = json["date"].string else {return nil}
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'hh-mm-ss"
         guard let date = dateFormatter.date(from: dateStr) else {return nil}
         guard let id = json["id"].string else {return nil}
         
@@ -57,15 +57,28 @@ public class EarthImage {
     public let url: String
     /// Image ID
     public let id: String
+    /// Percentage of clouds on image
+    public let cloudScore: Double?
+    
+    public var dateStr: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        return dateFormatter.string(from: self.date)
+    }
     
     /// Initializes EarthImage object fom a JSON
     init?(fromJSON json: JSON) {
         guard let dateStr = json["date"].string else {return nil}
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'hh-mm-ss"
         guard let date = dateFormatter.date(from: dateStr) else {return nil}
         guard let url = json["url"].string else {return nil}
         guard let id = json["id"].string else {return nil}
+        if let cloudScore = json["cloud_score"].double {
+            self.cloudScore = cloudScore
+        } else {
+            self.cloudScore = nil
+        }
         
         self.date = date
         self.url = url
@@ -86,7 +99,7 @@ public class EarthImage {
 }
 
 extension NasAPI {
-    public class func getImage(forLocation location: CLLocation, completion: @escaping EarthImageCompletion) {
+    public class func getImage(forLocation location: CLLocation, withCloudScore cloudScore: Bool = false, completion: @escaping EarthImageCompletion) {
         NasAPI.getEarthImageAssets(forLocation: location) { (assets, error) in
             if let error = error {
                 completion(nil, error); return
@@ -94,15 +107,16 @@ extension NasAPI {
             guard var assets = assets else {completion(nil, EarthImageError.NoResultsReturned); return}
             assets = assets.sorted { $0.date > $1.date }
             guard let closestAsset = assets.first else {completion(nil, EarthImageError.NoResultsReturned); return}
-            NasAPI.getImage(forAsset: closestAsset, andLocation: location, completion: completion)
+            NasAPI.getImage(forAsset: closestAsset, andLocation: location, withCloudScore: cloudScore, completion: completion)
         }
     }
     
-    class func getImage(forAsset asset: EarthAsset, andLocation location: CLLocation, completion: @escaping EarthImageCompletion) {
+    class func getImage(forAsset asset: EarthAsset, andLocation location: CLLocation, withCloudScore cloudScore: Bool, completion: @escaping EarthImageCompletion) {
         var url = "https://api.nasa.gov/planetary/earth/imagery"
         url += "?lon=\(location.coordinate.longitude)"
         url += "&lat=\(location.coordinate.latitude)"
         url += "&date=\(asset.dateStr)"
+        if cloudScore { url += "&cloud_score=true" }
         url += "&api_key=\(NasAPI.APIKey)"
         
         Alamofire.request(url).responseJSON { (response) in
