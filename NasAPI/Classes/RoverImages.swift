@@ -8,16 +8,18 @@ import Alamofire
 import AlamofireImage
 import SwiftyJSON
 
-public typealias RoverImageCompletion = ([RoverImage]?, Error?) -> Void
+public typealias RoverImageCompletion = ([RoverImage]?, RoverError?) -> Void
 public typealias RoverImageReturnValue = (images: [RoverImage], continue: Bool)
-public typealias RoverImageDownloadCompletion = (Image?, Error?) -> Void
+public typealias RoverImageDownloadCompletion = (Image?, RoverError?) -> Void
 
 //MARK: Enums
 
 public enum RoverError: String, Error {
     case InvalidRover = "Invalid Rover Name"
     case InvalidAPIKey
-    case FailedToInitializeObject
+    case FailedToInitializeRoverImage
+    case FailedToGetImage
+    case NoResultsReturned
     case Unknown
 }
 
@@ -52,8 +54,8 @@ public class RoverImage {
     /// Gets the Image object for the RoverImage object
     public func getImage(completion: @escaping RoverImageDownloadCompletion) {
         Alamofire.request(imgSrc).responseImage { (response) in
-            if let error = response.error {
-                completion(nil, error)
+            if response.error != nil {
+                completion(nil, .FailedToGetImage)
             }
             if let image = response.result.value {
                 completion(image, nil)
@@ -92,20 +94,20 @@ extension NasAPI {
         if NasAPI.APIKey != "" {
             url += "&api_key=\(NasAPI.APIKey)"
         } else {
-            completion(nil, RoverError.InvalidAPIKey)
+            completion(nil, .InvalidAPIKey)
         }
         Alamofire.request(url).responseJSON { (response) in
             switch response.result {
             case .success(let value):
                 let json = JSON(value)
                 if let error = json["errors"].string {
-                    completion(nil, RoverError(rawValue: error) ?? RoverError.Unknown)
+                    completion(nil, RoverError(rawValue: error) ?? .Unknown)
                 }
                 let images = NasAPI.getImages(fromJSON: json, atPage: page, withSol: sol, forRover: roverName, completion: completion)
                 completion(images.images, nil)
                 return
-            case .failure(let error):
-                completion(nil, error)
+            case .failure( _):
+                completion(nil, .NoResultsReturned)
                 return
             }
         }
@@ -119,7 +121,7 @@ extension NasAPI {
             if let image = RoverImage(withJSON: imageJSON) {
                 images.append(image)
             } else {
-                completion(nil, RoverError.FailedToInitializeObject)
+                completion(nil, .FailedToInitializeRoverImage)
             }
         }
         let page = page + 1

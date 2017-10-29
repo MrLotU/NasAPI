@@ -10,15 +10,16 @@ import AlamofireImage
 import SwiftyJSON
 import CoreLocation
 
-public typealias DownloadEarthImageCompletion = (Image?, Error?) -> Void
-public typealias EarthImageCompletion = (EarthImage?, Error?) -> Void
-public typealias EarthAssetCompletion = ([EarthAsset]?, Error?) -> Void
+public typealias DownloadEarthImageCompletion = (Image?, EarthImageError?) -> Void
+public typealias EarthImageCompletion = (EarthImage?, EarthImageError?) -> Void
+public typealias EarthAssetCompletion = ([EarthAsset]?, EarthImageError?) -> Void
 
 public enum EarthImageError: String, Error {
     case IndexOutOfRange = "list index out of range"
     case NoResultsReturned
     case FailedToInitializeImage
     case FailedToInitalizeAsset
+    case FailedToGetImage
     case Unknown
 }
 
@@ -88,8 +89,8 @@ public class EarthImage {
     /// Gets the image file for the EarthImage object
     public func getImage(completion: @escaping DownloadEarthImageCompletion) {
         Alamofire.request(url).responseImage { (response) in
-            if let error = response.error {
-                completion(nil, error)
+            if response.error != nil {
+                completion(nil, .FailedToGetImage)
             }
             if let image = response.result.value {
                 completion(image, nil)
@@ -126,10 +127,10 @@ extension NasAPI {
                 if let earthImage = EarthImage(fromJSON: json) {
                     completion(earthImage, nil)
                 } else {
-                    completion(nil, EarthImageError.FailedToInitializeImage)
+                    completion(nil, .FailedToInitializeImage)
                 }
-            case .failure(let error):
-                completion(nil, error)
+            case .failure( _):
+                completion(nil, .NoResultsReturned)
             }
         }
     }
@@ -144,7 +145,7 @@ extension NasAPI {
             case .success(let value):
                 let json = JSON(value)
                 if let error = json["error"].string {
-                    completion(nil, EarthImageError(rawValue: error) ?? EarthImageError.Unknown)
+                    completion(nil, EarthImageError(rawValue: error) ?? .Unknown)
                     return
                 }
                 guard let results = json["results"].array, results.count > 0 else {completion(nil, EarthImageError.NoResultsReturned); return}
@@ -159,8 +160,8 @@ extension NasAPI {
                 }
                 completion(assets, nil)
                 return
-            case .failure(let error):
-                completion(nil, error)
+            case .failure( _):
+                completion(nil, .NoResultsReturned)
                 return
             }
         }

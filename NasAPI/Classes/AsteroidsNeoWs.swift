@@ -8,10 +8,12 @@
 import Alamofire
 import SwiftyJSON
 
-public typealias AsteroidCopmletion = ([Asteroid]?, Error?) -> Void
+public typealias AsteroidCopmletion = ([Asteroid]?, NeoWsError?) -> Void
 
 public enum NeoWsError: Error {
     case FailedToInitializeObject
+    case NoResultsReturned
+    case FailedToGetAsteroidsJSON
     case Unknown
 }
 
@@ -109,10 +111,10 @@ extension NasAPI {
                 if let objects = json["near_earth_objects"][dateString].array {
                     getAsteroids(fromJSON: objects, completion: completion)
                 } else {
-                    completion(nil, NeoWsError.Unknown)
+                    completion(nil, .FailedToGetAsteroidsJSON)
                 }
-            case .failure(let error):
-                completion(nil, error)
+            case .failure( _):
+                completion(nil, .NoResultsReturned)
             }
         }
     }
@@ -124,7 +126,7 @@ extension NasAPI {
             if let asteroid = Asteroid(fromJSON: json) {
                 asteroids.append(asteroid)
             } else {
-                completion(nil, NeoWsError.FailedToInitializeObject)
+                completion(nil, .FailedToInitializeObject)
             }
         }
         completion(asteroids, nil)
